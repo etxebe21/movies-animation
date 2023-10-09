@@ -1,14 +1,15 @@
 import { API_KEY, GENRES } from "./config";
 
-const API_URL = 'https://api.themoviedb.org/3/movie/550?api_key=535a38d0574b48558fc561528c721bd8';
+const API_URL = `https://api.themoviedb.org/3/movie/550?api_key=${API_KEY}&sort_by=popularity.desc`;
 
-export const getMovies = async () = => {
-    try{
-        let response = await fetch(API_URL)
+export const getMovies = async () => {
+    try {
+        let response = await fetch(API_URL);
         let json = await response.json();
         const movies = json.results.map(
             ({
-                id, original_title,
+                id,
+                original_title,
                 poster_path,
                 backdrop_path,
                 vote_average,
@@ -24,12 +25,11 @@ export const getMovies = async () = => {
                 description: overview,
                 releaseDate: release_date,
                 genres: genre_ids.map(id => GENRES[id])
-
             })
-        )
-        return movies 
-    } catch (error){
-        console.log(error);
+        );
+        return movies;
+    } catch (error) {
+        console.error(error);
+        throw error; // Re-lanza el error para que el código que llama a esta función pueda manejarlo
     }
-    
-}
+};
