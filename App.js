@@ -73,11 +73,3 @@ const PosterDescription = styled.Text`
   font-size: 12px;
 `
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
