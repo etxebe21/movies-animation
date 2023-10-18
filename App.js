@@ -1,7 +1,6 @@
 import  React, {useState, useEffect} from 'react';
 import { FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import {AppLoading} from 'expo';
 import { useFonts } from 'expo-font';
 import styled from 'styled-components/native';
 import Rating from './componentes/Rating';
@@ -11,12 +10,12 @@ import * as CONSTANTS from './constants/constants'
 
 export default function App() {
   const [movies, setMovies] = useState([])
-  const [loaded, setLoaded] = useState(false)
+  //const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMovies()
       setMovies(data)
-      setLoaded(true)
+      //setLoaded(true)
     }
     fetchData()
   }, [])
@@ -25,9 +24,7 @@ export default function App() {
     'Syne-Mono': require('./assets/fonts/SyneMono-Regular.ttf'),
   });
 
-  if(!loaded || !fontLoaded) {
-    return <AppLoading/>;
-  }
+  
   return (
     <Container>
       <StatusBar/>
@@ -63,6 +60,20 @@ const Container = styled.View`
 `
 const PosterContainer = styled.View`
   width: ${CONSTANTS.ITEM_SIZE}px;
+`
+const Poster = styled.View`
+  margin-horizontal: ${CONSTANTS.SPACING}px;
+  padding: ${CONSTANTS.SPACING * 2}px;
+  align-items: center;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+`
+const PosterImage = styled.Image`
+  width: 100%;
+  height: ${CONSTANTS.ITEM_SIZE * 1.2}px;
+  resize-mode: cover;
+  border-radius: 10px;
+  margin: 0 0 10px 0;
 `
 const PosterTitle = styled.Text`
   font-family: Syne-Mono;
