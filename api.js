@@ -1,9 +1,8 @@
 import { API_KEY, GENRES } from "./config";
 
-const API_URL = `https://api.themoviedb.org/3/movie/550?api_key=${API_KEY}`;
-
 export const getMovies = async () => {
     try {
+        const API_URL = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc`;
         let response = await fetch(API_URL);
 
         if (!response.ok) {
@@ -12,26 +11,27 @@ export const getMovies = async () => {
 
         let json = await response.json();
 
-        // Verifica si la propiedad 'genres' está presente en la respuesta
-        if (!json.genres || !Array.isArray(json.genres)) {
-            throw new Error('Los datos de la API no contienen la información de géneros esperada');
+        // Verifica si la propiedad 'results' está presente en la respuesta
+        if (!json.results || !Array.isArray(json.results)) {
+            throw new Error('Los datos de la API no contienen la información de películas esperada');
         }
 
-        // Mapea los datos según la estructura esperada
-        const movie = {
-            key: String(json.id),
-            originalTitle: json.original_title,
-            posterPath: `https://image.tmdb.org/t/p/w500${json.poster_path}`,
-            backdropPath: `https://image.tmdb.org/t/p/w500${json.backdrop_path}`,
-            voteAverage: json.vote_average,
-            description: json.overview,
-            releaseDate: json.release_date,
-            genres: json.genres.map(({ id }) => GENRES[id] || 'Unknown Genre'),
-        };
+        
+        const movies = json.results.map(movie => ({
+            key: String(movie.id),
+            originalTitle: movie.original_title,
+            posterPath: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            backdropPath: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
+            voteAverage: movie.vote_average,
+            description: movie.overview,
+            releaseDate: movie.release_date,
+            genres: movie.genre_ids.map(id => GENRES[id] || 'Unknown Genre'),
+        }));
 
-        return [movie]; // Devuelve un array con la película para que coincida con la estructura de datos esperada
+        //console.log(movies);
+        return movies; 
     } catch (error) {
-        console.error("Error al obtener película:", error);
-        throw error; // Re-lanza el error para que el código que llama a esta función pueda manejarlo
+        console.error("Error al obtener películas:", error);
+        throw error;
     }
 };

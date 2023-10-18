@@ -10,12 +10,12 @@ import * as CONSTANTS from './constants/constants'
 
 export default function App() {
   const [movies, setMovies] = useState([])
-  //const [loaded, setLoaded] = useState(false)
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMovies()
       setMovies(data)
-      //setLoaded(true)
+      
     }
     fetchData()
   }, [])
@@ -63,7 +63,7 @@ const PosterContainer = styled.View`
 `
 const Poster = styled.View`
   margin-horizontal: ${CONSTANTS.SPACING}px;
-  padding: ${CONSTANTS.SPACING * 2}px;
+  padding: ${CONSTANTS.SPACING * 3}px;
   align-items: center;
   background-color: #FFFFFF;
   border-radius: 10px;
