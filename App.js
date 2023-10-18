@@ -17,7 +17,7 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMovies()
-      setMovies(data)
+      setMovies([{ key: 'left-spacer'}, ...data, {key: 'right-spacer'}])
       
     }
     fetchData()
@@ -49,15 +49,19 @@ export default function App() {
         renderItem={({item, index}) => {
 
           const inputRange = [
-            (index -1) * CONSTANTS.ITEM_SIZE,
-            index * CONSTANTS.ITEM_SIZE,
-            (index + 1) * CONSTANTS.ITEM_SIZE
+            (index -2) * CONSTANTS.ITEM_SIZE,
+            (index - 1) * CONSTANTS.ITEM_SIZE,
+            index * CONSTANTS.ITEM_SIZE
           ]
 
           const translateY = scrollX.interpolate({
             inputRange,
             outputRange: [0, -50, 0]
           })
+
+          if(!item.originalTitle) {
+            return <DummyContainer/>
+          }
 
           return(
             <PosterContainer>
@@ -106,3 +110,6 @@ const PosterDescription = styled.Text`
   font-size: 12px;
 `
 
+const DummyContainer = styled.View`
+  width: ${CONSTANTS.SPACER_ITEM_SIZE}px;
+`
