@@ -32,6 +32,7 @@ export default function App() {
   
   return (
     <Container>
+    <Backdrop/>
       <StatusBar/>
       <Animated.FlatList 
         showsHorizontalScrollIndicator={false}
@@ -78,9 +79,47 @@ export default function App() {
           )
         }}
         />
-    </Container>
-   
+    </Container> 
   );
+}
+
+const Backdrop = ({ movies, scrollX}) => {
+  return(
+    <ContentContainer>
+      <FlatList
+        data={movies}
+        keyExtractor={item => `${item.key}-back`}
+        removeClippedSubviews={false}
+        contentContainerStyle={{ width: CONSTANTS.WIDTH, height: CONSTANTS.BACKDROP_HEIGHT}}
+        renderItem={({ item, index}) => {
+          if(!item.backdropPath){
+            return null
+          }
+          const translateX = scrollX.interpolate({
+            inputRange: [(index - 1) * CONSTANTS.ITEM_SIZE, index * CONSTANTS.ITEM_SIZE],
+            outputRange: [0, CONSTANTS.WIDTH]
+          })
+          return(
+            <BackdropContainer
+              as={Animated.View}
+              style={{transform:[{ translateX: translateX}]}}
+            >
+                <BackdropImage source={{uri:item.backdropPath}} />
+            </BackdropContainer>
+          )
+        }}
+        />
+        <LinearGradient
+          colors={['rgba(0, 0, 0, 0)', 'grey']}
+          style= {{
+            height: CONSTANTS.BACKDROP_HEIGHT,
+            width: CONSTANTS.WIDTH,
+            position: 'absolute',
+            bottom: 0,
+          }}
+        />
+    </ContentContainer>
+  )
 }
 
 const Container = styled.View`
@@ -120,7 +159,7 @@ const DummyContainer = styled.View`
   width: ${CONSTANTS.SPACER_ITEM_SIZE}px;
 `
 
-const ContentCOntainer = styled.View`
+const ContentContainer = styled.View`
   position: absolute;
   width: ${CONSTANTS.WIDTH}px;
   height: ${CONSTANTS.BACKDROP_HEIGHT}px;
