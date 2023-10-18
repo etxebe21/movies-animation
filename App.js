@@ -1,5 +1,5 @@
-import  React, {useState, useEffect} from 'react';
-import { FlatList } from 'react-native';
+import  React, {useState, useEffect, useRef} from 'react';
+import { Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import styled from 'styled-components/native';
@@ -8,8 +8,11 @@ import Genre from './componentes/Genre';
 import {getMovies} from './api';
 import * as CONSTANTS from './constants/constants'
 
+
+
 export default function App() {
   const [movies, setMovies] = useState([])
+  const scrollX = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,18 +31,37 @@ export default function App() {
   return (
     <Container>
       <StatusBar/>
-      <FlatList 
+      <Animated.FlatList 
         showsHorizontalScrollIndicator={false}
         data={movies}
         keyExtractor={item => item.key}
         horizontal
+        snapToInterval={CONSTANTS.ITEM_SIZE}
+        decelerationRate={0}
+        onScroll={Animated.event(
+          [ { nativeEvent: { contentOffset: {x: scrollX}}}],
+          {useNativeDriver: true}
+        )}
+        scrollEventThrottle={16}
         contentContainerStyle={{
           alignItems: 'center'
         }}
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
+
+          const inputRange = [
+            (index -1) * CONSTANTS.ITEM_SIZE,
+            index * CONSTANTS.ITEM_SIZE,
+            (index + 1) * CONSTANTS.ITEM_SIZE
+          ]
+
+          const translateY = scrollX.interpolate({
+            inputRange,
+            outputRange: [0, -50, 0]
+          })
+
           return(
             <PosterContainer>
-              <Poster>
+              <Poster as={Animated.View} style={{transform: [{translateY}]}}>
                 <PosterImage source ={{ uri: item.posterPath}} />
                 <PosterTitle numberOfLines={1}>{item.description}</PosterTitle>
                 <Rating rating={item.voteAverage} />
