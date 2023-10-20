@@ -1,9 +1,9 @@
 import  React, {useState, useEffect, useRef} from 'react';
-import { Animated, FlatList, View, Image } from 'react-native';
+import { Animated, FlatList,  } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { LinearGradient } from 'expo-linear-gradient';
-import {MaterialCommunityIcons} from '@expo/vector-icons';
+
 import styled from 'styled-components/native';
 import Rating from './componentes/Rating';
 import Genre from './componentes/Genre';
@@ -14,7 +14,9 @@ import * as CONSTANTS from './constants/constants'
 
 export default function App() {
   const [movies, setMovies] = useState([])
+  const [selectedMovie, setSelectedMovie] = useState(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const [containerHeight, setContainerHeight] = useState(CONSTANTS.ITEM_SIZE);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,20 +64,35 @@ export default function App() {
             outputRange: [0, -50, 0]
           })
 
-          if(!item.originalTitle) {
+          if(!item.name) {
             return <DummyContainer/>
           }
 
           return(
-            <PosterContainer>
-              <Poster as={Animated.View} style={{transform: [{translateY}]}}>
-                <PosterImage source ={{ uri: item.posterPath}} />
-                <PosterTitle numberOfLines={1}>{item.description}</PosterTitle>
-                <Rating rating={item.voteAverage} />
-                <Genre genres={item.genres}/>
-                <PosterDescription numberOfLines={5}>{item.description}</PosterDescription>
-              </Poster>
-            </PosterContainer>
+            <PosterContainer onPress={() => {
+              setSelectedMovie(item);
+                setContainerHeight(
+                  CONSTANTS.ITEM_SIZE +
+                    (item.species ? CONSTANTS.ITEM_SIZE * 0.5 : 0) +
+                    (item.type ? CONSTANTS.ITEM_SIZE * 0.5 : 0)
+                );
+              }}
+              height={containerHeight}    
+>
+              <Poster as={Animated.View} style={{ transform: [{ translateY }] }}>
+              <PosterImage source={{ uri: item.image }} />
+              <GenreContainer>
+                <Text>{item.status}</Text>
+              </GenreContainer>
+              <PosterTitle numberOfLines={3}>{item.name}</PosterTitle>
+              {selectedMovie === item && (
+                <>
+                  <PosterSpecie>{item.species}</PosterSpecie>
+                  <PosterDescription>{item.type}</PosterDescription>
+            </>
+              )}
+    </Poster>
+  </PosterContainer>
           )
         }}
         />
@@ -92,7 +109,7 @@ const Backdrop = ({ movies, scrollX}) => {
         removeClippedSubviews={false}
         contentContainerStyle={{ width: CONSTANTS.WIDTH, height: CONSTANTS.BACKDROP_HEIGHT}}
         renderItem={({ item, index}) => {
-          if(!item.backdropPath){
+          if(!item.image){
             return null
           }
           const translateX = scrollX.interpolate({
@@ -104,7 +121,7 @@ const Backdrop = ({ movies, scrollX}) => {
               as={Animated.View}
               style={{transform:[{ translateX: translateX}]}}
             >
-                <BackdropImage source={{uri:item.backdropPath}} />
+                <BackdropImage source={{uri:item.image}} />
             </BackdropContainer>
           )
         }}
@@ -127,9 +144,10 @@ const Container = styled.View`
   padding-top: 50px;
   background-color: #000;
 `
-const PosterContainer = styled.View`
+const PosterContainer = styled.TouchableOpacity`
   width: ${CONSTANTS.ITEM_SIZE}px;
   margin-top: ${CONSTANTS.TOP}px;
+  height: ${(props) => props.height}px;
 `
 const Poster = styled.View`
   margin-horizontal: ${CONSTANTS.SPACING}px;
@@ -155,6 +173,12 @@ const PosterDescription = styled.Text`
   font-size: 12px;
   color: #FFF;
 `
+const PosterSpecie = styled.Text`
+  font-family: Syne-Mono;
+  font-size: 12px;
+  color: #FFF;
+`
+
 const DummyContainer = styled.View`
   width: ${CONSTANTS.SPACER_ITEM_SIZE}px;
 `
@@ -175,4 +199,15 @@ const BackdropImage = styled.Image`
   position: absolute;
   width: ${CONSTANTS.WIDTH}px;
   height: ${CONSTANTS.BACKDROP_HEIGHT}px;
+`
+const GenreContainer = styled.View`
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    margin: 0 2px 2px 0;
+    padding: 3px;
+`
+const Text = styled.Text`
+    opacity: 0.8;
+    font-size: 10px;
+    color: #CCCCCC;
 `

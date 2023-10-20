@@ -2,7 +2,7 @@ import { API_KEY, GENRES } from "./config";
 
 export const getMovies = async () => {
     try {
-        const API_URL = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc`;
+        const API_URL = `https://rickandmortyapi.com/api/character/?page=19`;
         let response = await fetch(API_URL);
 
         if (!response.ok) {
@@ -17,16 +17,14 @@ export const getMovies = async () => {
         }
 
         
-        const movies = json.results.map(movie => ({
-            key: String(movie.id),
-            originalTitle: movie.original_title,
-            posterPath: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-            backdropPath: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
-            voteAverage: movie.vote_average,
-            description: movie.overview,
-            releaseDate: movie.release_date,
-            genres: movie.genre_ids.map(id => GENRES[id] || 'Unknown Genre'),
-        }));
+        const movies = json.results.map((movie, index) => ({
+            key: `${movie.name}-${index}`, // Usamos el nombre del pokémon y su índice como clave única
+            name: movie.name,
+            image: movie.image,
+            type: movie.type,
+            status: movie.status,
+            species: movie.species
+          }));
 
         //console.log(movies);
         return movies; 
